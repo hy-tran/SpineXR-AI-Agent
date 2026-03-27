@@ -4,8 +4,9 @@ from pathlib import Path
 
 
 def main() -> None:
-    input_dir = Path("./input_dicom")
-    output_dir = Path("./output_jpg")
+    input_dir = Path("data/raw/train_images")
+    output_dir = Path("data/yolo_dataset/images")
+    
     output_dir.mkdir(parents=True, exist_ok=True)
     print(f"TODO: convert DICOM from {input_dir} to JPG in {output_dir}")
 

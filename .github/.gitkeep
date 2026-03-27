@@ -1,0 +1,46 @@
+# 🦴 SpineXR AI Agent: Hệ thống hỗ trợ chẩn đoán tổn thương cột sống
+
+[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
+[![YOLOv8](https://img.shields.io/badge/YOLOv8-FF1493?style=for-the-badge&logo=yolo&logoColor=white)](https://ultralytics.com/)
+[![Modal](https://img.shields.io/badge/Modal.com-000000?style=for-the-badge&logo=modal&logoColor=white)](https://modal.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Orthanc](https://img.shields.io/badge/Orthanc-0052CC?style=for-the-badge&logo=docker&logoColor=white)](https://www.orthanc-server.com/)
+
+SpineXR AI Agent là một hệ thống y tế thông minh (Medical AI Agent) được thiết kế để hỗ trợ các bác sĩ chẩn đoán 13 loại tổn thương cột sống từ ảnh X-ray (dựa trên bộ dữ liệu VinDr-SpineXR). Dự án áp dụng kiến trúc Serverless Microservices, tối ưu hóa chi phí vận hành và tuân thủ các tiêu chuẩn bảo mật y tế cơ bản.
+
+## ✨ Tính năng nổi bật (Key Features)
+
+* **🤖 AI Object Detection (YOLOv8):** Phát hiện và định vị chính xác tổn thương trên ảnh X-ray với tốc độ dưới 2 giây/ảnh.
+* **🔍 Image Retrieval (Pinecone Vector DB):** Tự động gợi ý 3 ca bệnh có đặc điểm tổn thương tương tự từ cơ sở dữ liệu để bác sĩ tham khảo (RAG cho hình ảnh).
+* **🩺 Human-in-the-loop:** UI/UX trên Mobile cho phép bác sĩ kéo thả, chỉnh sửa Bounding Box của AI trước khi lưu báo cáo cuối cùng.
+* **🏥 DICOM Standard Support:** Tích hợp Orthanc Server để đọc, trích xuất và quản lý chuẩn file y tế `.dicom`.
+* **🔒 Secure by Design:** Áp dụng Row Level Security (RLS) bảo vệ dữ liệu bệnh nhân và ẩn danh siêu dữ liệu (Metadata Anonymization).
+
+---
+
+## 🏗️ Kiến trúc Hệ thống (System Architecture)
+
+Dự án được chia thành 3 phân hệ chính giao tiếp qua RESTful APIs:
+
+1. **Client Tier (Mobile App):** Xây dựng bằng Flutter, đóng vai trò là "Thin Client". Quản lý giao diện, Auth và hiển thị kết quả.
+2. **Backend & Data Tier:** Sử dụng Supabase (PostgreSQL + Auth), AWS S3 (Lưu trữ ảnh gốc), và Orthanc (DICOM Server chạy trên VPS Docker).
+3. **AI Inference Tier:** Triển khai hoàn toàn Serverless trên Modal.com. Khởi tạo GPU tự động khi có request, chạy model YOLOv8 và tự tắt để tối ưu chi phí.
+
+---
+
+## 📂 Cấu trúc thư mục (Monorepo Structure)
+
+```text
+spine-xr-project/
+├── ai-engine/              # [AI] Mã nguồn chạy Serverless trên Modal (Hưng & Khoa)
+│   ├── src/                # File agent.py chứa FastAPI endpoint
+│   ├── models/             # Chứa file weights best.pt 
+│   └── requirements.txt    # Các dependencies (ultralytics, fastapi...)
+├── backend/                # [Infra/Sec] Quản lý Database và Server (Huy & Trung)
+│   ├── docker/             # Docker Compose cho Orthanc DICOM Server
+│   └── supabase/           # SQL Migrations và phân quyền RLS
+├── mobile-app/             # [Frontend] Source code ứng dụng Flutter (Bảo Anh)
+│   ├── lib/                # UI screens, logic calls, custom painters
+│   └── pubspec.yaml        # Flutter dependencies
+├── data-tools/             # [Data] Các script xử lý dữ liệu nội bộ (Khoa)
+└── docs/                   # Tài liệu API, thiết kế hệ thống
